@@ -49,11 +49,40 @@ app.MapGet("/", () => Results.Json(new Home())).WithTags("Home");
 #endregion
 
 #region Administradores
-app.MapPost("/Administrador/login", ([FromBody] LoginDTO loginDTO, IAdministradorServico administradorServico) =>
-{
-    if(administradorServico.Login(loginDTO) != null)
+string GerarTokenJWT(Adm adm){
+    if(string.IsNullOrEmpty(key)) return string.Empty;
+
+    var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetByte(key));
+    var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+
+    var claims = new List<Claim>()
     {
-        return Results.Ok("Login realizado com sucesso!");
+        new CLaim("Email", administrador.Email),
+        new Claim("Perfil", administrador.Perfil)
+    };
+
+    var token = new JwtSecurityToken(
+        claims: claims,
+        expires: Datetime.Now.AddDays(1),
+        signingCredentials: credentials
+    );
+
+    return new JwtSecurityTokenHandler().WriteToken(token);
+};
+
+app.MapPost("/Administrador/login", ([FromBody] LoginDTO loginDTO, IAdministradorServico administradorServico) =>
+{   
+    var adm = administradorServico.Login(loginDTO);
+
+    if(adm != null)
+    {
+        string token = GerarTokenJwt(administrador);
+        return Results.Ok(new AdministradorLogado
+        {
+            Email = adm.Email,
+            Perfil = adm.Perfil,
+            Token = token
+        });
     } else 
     {
         return Results.Unauthorized();
