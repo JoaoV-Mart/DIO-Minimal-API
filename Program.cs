@@ -43,6 +43,36 @@ app.MapPost("/Administrador/login", ([FromBody] LoginDTO loginDTO, IAdministrado
         return Results.Unauthorized();
     }
 }).WithTags("Administradores");
+
+app.MapPost("/Administradores", ([FromBody] AdministradorDTO administrador DTO, IAdministradorServico administradorServico) =>
+{
+    var validacao = new ErrosDeValidacao{
+        Mensagens = new List<string>()
+    };    
+    
+    if(string.IsNullOrEmpty(administradorDTO.Email))
+        validacao.Mensagens.Add("Email não pode ser vazio");
+  
+    if(string.IsNullOrEmpty(administradorDTO.Senha))
+        validacao.Mensagens.Add("Senha não pode ser vazia");
+    
+    if(string.IsNullOrEmpty(administradorDTO.Perfil))
+        validacao.Mensagens.Add("Perfil não pode ser vazio");
+
+    if(validacao.Mensagens.Count > 0)
+        return Results.BadRequest(validacao);    
+
+    var administrador = new Adm{
+        Email = administradorDTO.Email,
+        Senha = administradorDTO.Senha,
+        Perfil = administradorDTO.Perfil
+    };
+
+    administradorServico.Inserir(administrador);
+
+    return Results.Created($"/veiculo/{veiculo.Id}", veiculo);
+                                     
+}).WithTags("Administradores");
 #endregion
 
 #region Veiculos
