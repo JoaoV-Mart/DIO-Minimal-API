@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using MinimalsApi.Dominio.Interfaces;
 using MinimalsApi.Dominio.ModelViews;
 using MinimalsApi.Dominio.Servicos;
@@ -9,6 +10,21 @@ using MinimalsApi.Infraestrutura.Db;
 
 #region Builder
 var builder = WebApplication.CreateBuilder(args);
+
+var key = builder.Configuration.GetSection("Jwt").ToString();
+if(string.IsNullOrEmpty(key)) key = "1234567"
+
+builder.Services.AddAuthentication(option => {
+    option.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    option.DefaultChallengeScheme = JwtBearerDefault.AuthenticationScheme;
+}).AddJwtBearer(option =>{
+    option.TokenValidationParameters = new TokenValidationParameters{
+        ValidationLifetime = true,
+        IssuerSigningKey = new SymmetricSecurityKey(Ecoding.UTF8.GetBytes(key))
+    };
+});
+
+builder.Services.AddAuthorization();
 
 builder.Services.AddScoped<IAdministradorServico, AdministradorServico>();
 
@@ -77,7 +93,7 @@ app.MapPost("/Administradores", ([FromBody] AdministradorDTO administrador DTO, 
             Perfil = administrador.Perfil
         });
                                      
-}).WithTags("Administradores");
+}).RequiredAuthorization().WithTags("Administradores");
 
 app.MapGet("/Administradores", ([FromQuery] int? pagina, IAdministradorServico administradorServico) =>
 {
@@ -96,7 +112,7 @@ app.MapGet("/Administradores", ([FromQuery] int? pagina, IAdministradorServico a
 
     return Results.Ok(adms);
 
-}).WithTags("Administradores");
+}).RequiredAuthorization().WithTags("Administradores");
 
 app.MapGet("/Administradores/{id}", ([FromRoute] int id, IAdministradorServico administradorServico) =>
 {
@@ -113,7 +129,7 @@ app.MapGet("/Administradores/{id}", ([FromRoute] int id, IAdministradorServico a
         }
     );
 
-}).WithTags("Administradores");
+}).RequiredAuthorization().WithTags("Administradores");
 #endregion
 
 #region Veiculos
@@ -151,14 +167,14 @@ app.MapPost("/veiculos", ([FromBody] VeiculoDTO veiculoDTO, IVeiculoServico veic
     veiculoServico.Inserir(veiculo);
 
     return Results.Created($"/veiculo/{veiculo.Id}", veiculo);
-}).WithTags("Veiculos");
+}).RequiredAuthorization().WithTags("Veiculos");
 
 app.MapGet("/veiculos", ([FromQuery] int? pagina, IVeiculoServico veiculoServico) =>
 {
     var veiculos = veiculoServico.Todos(pagina);
 
     return Results.Ok(veiculos);
-}).WithTags("Veiculos");
+}).RequiredAuthorization().WithTags("Veiculos");
 
 app.MapGet("/veiculo/{id}", ([FromRoute] int id, IVeiculoServico veiculoServico) =>
 {
@@ -167,7 +183,7 @@ app.MapGet("/veiculo/{id}", ([FromRoute] int id, IVeiculoServico veiculoServico)
     if(veiculo == null) return Results.NotFound();
     return Results.Ok(veiculo);
 
-}).WithTags("Veiculos");
+}).RequiredAuthorization().WithTags("Veiculos");
 
 app.MapPut("/veiculo/{id}", ([FromRoute] int id, VeiculoDTO veiculoDTO, IVeiculoServico veiculoServico) =>
 {
@@ -187,7 +203,7 @@ app.MapPut("/veiculo/{id}", ([FromRoute] int id, VeiculoDTO veiculoDTO, IVeiculo
 
     return Results.Ok(veiculo);
 
-}).WithTags("Veiculos");
+}).RequiredAuthorization().WithTags("Veiculos");
 
 app.MapDelete("/veiculo/{id}", ([FromRoute] int id, IVeiculoServico veiculoServico) =>
 {
@@ -198,7 +214,7 @@ app.MapDelete("/veiculo/{id}", ([FromRoute] int id, IVeiculoServico veiculoServi
     
     return Results.NoContent();
 
-}).WithTags("Veiculos");
+}).RequiredAuthorization().WithTags("Veiculos");
 #endregion
 
 #region App
@@ -206,5 +222,11 @@ app.UseSwagger();
 
 app.UseSwaggerUI();
 
+app.UseAuthentication();
+
+app.UseAuthorization();
+
 app.Run();
 #endregion
+
+//dotnet add package Microsoft.AspNetCore.Authentication.JwtBearer
