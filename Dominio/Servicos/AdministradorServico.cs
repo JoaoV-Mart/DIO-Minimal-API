@@ -20,4 +20,32 @@ public class AdministradorServico : IAdministradorServico
         
         return adm;
     }
+
+    public Adm Incluir(Adm adm)
+    {
+        _contexto.Admnistradores.Add(adm);
+        _contexto.SaveChanges();
+
+        return adm;
+    }
+
+    public Adm? BuscarPorId(int id)
+    {
+        return _contexto.Adm.Where(v => v.Id == id).FirstOrDefault();
+    }
+
+    public List<Adm> Todos(AdministradorDTO administradorDTO)
+    {
+        var query = _contexto.Admnistradores.AsQueryable();
+
+        var itensPorPagina = 10;
+
+        if(pagina != null)
+        {
+            query = query.Skip(((int)pagina - 1) * itensPorPagina).Take(itensPorPagina);
+        }
+
+        return query.ToList();
+
+    }
 }
