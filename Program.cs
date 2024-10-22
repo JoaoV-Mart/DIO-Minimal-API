@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using MinimalsApi.Dominio.Interfaces;
@@ -81,7 +82,7 @@ string GerarTokenJWT(Adm adm){
     {
         new CLaim("Email", administrador.Email),
         new Claim("Perfil", administrador.Perfil)
-        new Claim(ClaimTypes.Role, administrador.Perfil),
+        new Claim(ClaimTypes.Role, administrador.Perfil)
     };
 
     var token = new JwtSecurityToken(
@@ -112,7 +113,7 @@ app.MapPost("/Administrador/login", ([FromBody] LoginDTO loginDTO, IAdministrado
     }
 }).AllowAnonymous().WithTags("Administradores");
 
-app.MapPost("/Administradores", ([FromBody] AdministradorDTO administrador DTO, IAdministradorServico administradorServico) =>
+app.MapPost("/Administradores", ([FromBody] AdministradorDTO administradorDTO, IAdministradorServico administradorServico) =>
 {
     var validacao = new ErrosDeValidacao{
         Mensagens = new List<string>()
