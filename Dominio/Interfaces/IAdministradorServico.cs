@@ -7,7 +7,7 @@ public interface IAdministradorServico
 {
     Adm? Login(LoginDTO loginDTO);
 
-    Adm Incluir(Adm adm);
+    Adm Incluir(AdministradorDTO administradorDTO);
 
     Adm? BuscarPorId(int id);
 
