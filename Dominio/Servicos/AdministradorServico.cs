@@ -31,10 +31,10 @@ public class AdministradorServico : IAdministradorServico
 
     public Adm? BuscarPorId(int id)
     {
-        return _contexto.Adm.Where(v => v.Id == id).FirstOrDefault();
+        return _contexto.Admnistradores.Where(v => v.Id == id).FirstOrDefault();
     }
 
-    public List<Adm> Todos(AdministradorDTO administradorDTO)
+    public List<Adm> Todos(int? pagina)
     {
         var query = _contexto.Admnistradores.AsQueryable();
 
