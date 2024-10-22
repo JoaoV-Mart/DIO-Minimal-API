@@ -151,17 +151,17 @@ app.MapPost("/Administradores", ([FromBody] AdministradorDTO administradorDTO, I
 
 app.MapGet("/Administradores", ([FromQuery] int? pagina, IAdministradorServico administradorServico) =>
 {
-    var adm = new List<AdministradorModelView>();
+    var adms = new List<AdministradorModelView>();
     var administradores = administradorServico.Todos(pagina);
 
     foreach(var adm in administradores)
     {
-        adms.Add(new AdministradorModelView)
+        adms.Add(new AdministradorModelView
         {
             Id = adm.Id,
             Email = adm.Email,
             Perfil = adm.Perfil
-        }
+        });
     }
 
     return Results.Ok(adms);
