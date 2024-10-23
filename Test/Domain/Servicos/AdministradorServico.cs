@@ -92,7 +92,7 @@ public class AdministradorServicoTest
         var paginaDoBanco = admServico.Todos(pagina);
 
         //Assert
-        Assert.AreEqual( > 1, paginaDoBanco.Count());
+        Assert.True(paginaDoBanco.Count() > 1);
 
     }
 }
