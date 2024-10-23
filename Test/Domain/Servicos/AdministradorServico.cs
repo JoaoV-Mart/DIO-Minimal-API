@@ -69,7 +69,7 @@ public class AdministradorServicoTest
         var admDoBanco = admServico.BuscarPorId(adm.Id);
 
         //Assert
-        Assert.AreEqual(1, admDoBanco.Id);
+        Assert.AreEqual(1, admDoBanco?.Id);
 
     }
 
