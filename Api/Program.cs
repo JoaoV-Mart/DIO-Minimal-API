@@ -10,7 +10,7 @@ using MinimalsApi.DTOs;
 using MinimalsApi.Entidades;
 using MinimalsApi.Infraestrutura.Db;
 using System.IdentityModel.Tokens.Jwt;
-using System.Security.CLaims;
+//using System.Security.CLaims;
 using Microsoft.OpenApi.Models;
 
 #region Builder
